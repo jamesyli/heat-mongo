@@ -49,6 +49,7 @@ resources:
         str_replace:
           template: { get_file: setup.sh }
           params:
+            $db_size: { get_param: db_size }
             wc_notify: { get_attr: [wait_handle, curl_cli] }
 
   cinder_volume:

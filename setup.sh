@@ -1,6 +1,6 @@
 #!/bin/bash
 
-volume_size="1"
+volume_size=$db_size
 
 function git_clone_with_retry () {
   local GIT_REPO=$1
