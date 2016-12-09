@@ -1,0 +1,76 @@
+heat_template_version: 2016-10-14
+
+description: >
+  Dockerize a mongoDB cluster with OpenStack Heat.
+
+parameters:
+  key:
+    type: string
+    default: mac
+
+  flavor:
+    type: string
+    default: general1-4
+
+  image:
+    type: string
+    default: 821ba5f4-712d-4ec8-9c65-a3fa4bc500f9
+
+  public_net:
+    type: string
+    default: PublicNet
+
+  volume_size:
+    type: number
+    default: 75
+    constraints:
+      - range: { min: 75, max: 1024 }
+
+  db_size:
+    type: number
+    default: 1
+    constraints:
+      - range: { min: 1, max: 75 }
+
+resources:
+  docker_server:
+    type: OS::Nova::Server
+    properties:
+      key_name: { get_param: key }
+      image: { get_param: image }
+      flavor: { get_param: flavor}
+      personality: {"/root/mongo-cluster.js": {get_file: mongo-cluster.js}}
+      block_device_mapping:
+        - device_name: xvdb
+          delete_on_termination: true
+          volume_id: { get_resource: cinder_volume }
+      user_data_format: RAW
+      user_data:
+        str_replace:
+          template: { get_file: setup.sh }
+          params:
+            wc_notify: { get_attr: [wait_handle, curl_cli] }
+
+  cinder_volume:
+    type: OS::Cinder::Volume
+    properties:
+      size: { get_param: volume_size }
+
+  wait_handle:
+    type: OS::Heat::SwiftSignalHandle
+
+  wait_condition:
+    type: OS::Heat::SwiftSignal
+    properties:
+      handle: {get_resource: wait_handle}
+      count: 1
+      timeout: 600
+
+outputs:
+  url:
+    description: Public address
+    value:
+      str_replace:
+        template: http://host
+        params:
+          host: { get_attr: [docker_server, networks, public, 0] }
