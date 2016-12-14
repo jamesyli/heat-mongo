@@ -78,7 +78,7 @@ fi
 
 sleep 5
 
-mongo /root/mongo-cluster.js
+#mongo /root/mongo-cluster.js
 
 if [[ $? != 0 ]]; then
   wc_notify --data-binary '{"status": "FAILURE", "reason": "Failed config mongo cluster."}'
