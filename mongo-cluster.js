@@ -5,6 +5,4 @@ var cfg = { _id: 'my-mongo-set',
         { _id: 2, host: 'mongo-sec2:27017'}
     ]
 };
-
 rs.initiate(cfg);
-
