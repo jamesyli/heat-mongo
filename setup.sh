@@ -64,7 +64,7 @@ fi
 
 # setup mongo cluster
 
-docker pull mongo
+docker pull mongo:3.4
 docker network create mongo-cluster
 
 docker run --name mongo-pri -p 27017:27017 -v primary:/data/db --network mongo-cluster -d mongo mongod --replSet my-mongo-set
